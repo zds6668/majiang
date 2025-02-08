@@ -29,8 +29,8 @@ class MainActivity : AppCompatActivity() {
     // 当前局数
     private var currentRound = 1
 
-    // 自摸玩家顺序（每局最多4个自摸玩家）
-    private val zimoOrder = mutableListOf<Int>()
+    // 已经胡牌的玩家（自摸和点炮的玩家共享）
+    private val huPlayers = mutableSetOf<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,14 +98,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------- 自摸计分 ----------------
-// ---------------- 自摸计分 ----------------
     private fun showZimoDialog() {
-        // 检查是否已有3个玩家自摸
-        if (zimoOrder.size >= 3) {
-            Toast.makeText(this, "已经有3个玩家自摸，不能再自摸", Toast.LENGTH_SHORT).show()
+        if (huPlayers.size >= 3) {
+            Toast.makeText(this, "已经有3个玩家胡牌，不能再自摸", Toast.LENGTH_SHORT).show()
             return
         }
-
         val builder = AlertDialog.Builder(this)
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_zimo, null)
         builder.setView(dialogView)
@@ -164,14 +161,26 @@ class MainActivity : AppCompatActivity() {
             }
             // 获取底分
             val bottomScore = spinnerBottomScore.selectedItem.toString().toInt()
-            // 自摸计算：胡牌玩家加分 = 底分 × 番数 × 3；其他玩家各扣 底分 × 番数
+            // 获取自摸玩家索引
             val winnerIndex = spinnerWinner.selectedItemPosition
-            val winScore = bottomScore * selectedFan * 3
+
+            // 检查该玩家是否已胡牌
+            if (huPlayers.contains(winnerIndex)) {
+                Toast.makeText(this, "该玩家已经胡牌，无法自摸", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // 记录该玩家的自摸
+            huPlayers.add(winnerIndex)
+
+            // 计算分数
+            val winScore = bottomScore * selectedFan * (4 - huPlayers.size) // 根据胡牌玩家的数量计算得分
             val loseScore = bottomScore * selectedFan
 
             // 更新累计得分
             for (i in totalScores.indices) {
-                totalScores[i] += if (i == winnerIndex) winScore else -loseScore
+                if (i == winnerIndex) totalScores[i] += winScore
+                else totalScores[i] -= loseScore
             }
 
             // 更新当前局得分
@@ -192,9 +201,12 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-
     // ---------------- 点炮计分 ----------------
     private fun showDianpaoDialog() {
+        if (huPlayers.size >= 3) {
+            Toast.makeText(this, "已经有3个玩家胡牌，不能再点炮", Toast.LENGTH_SHORT).show()
+            return
+        }
         val builder = AlertDialog.Builder(this)
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_dianpao, null)
         builder.setView(dialogView)
@@ -254,10 +266,18 @@ class MainActivity : AppCompatActivity() {
             // 获取胡牌和点炮玩家索引
             val winnerIndex = spinnerWinner.selectedItemPosition
             val dianpaoIndex = spinnerDianpao.selectedItemPosition
+            // 检查该玩家是否已胡牌
+            if (huPlayers.contains(winnerIndex)) {
+                Toast.makeText(this, "该玩家已经胡牌，无法点炮", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (winnerIndex == dianpaoIndex) {
                 Toast.makeText(this, "胡牌玩家和点炮玩家不能相同", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            // 记录该玩家的自摸
+            huPlayers.add(winnerIndex)
             // 获取底分
             val bottomScore = spinnerBottomScore.selectedItem.toString().toInt()
             // 点炮计算：胡牌玩家加分 = 底分 × 番数；点炮玩家扣分 = 底分 × 番数
@@ -299,8 +319,8 @@ class MainActivity : AppCompatActivity() {
         // 清除局记录
         roundsAdapter.notifyDataSetChanged()
 
-        // 清除自摸玩家顺序
-        zimoOrder.clear()
+        // 清除胡牌玩家记录
+        huPlayers.clear()
 
         // 更新总得分显示
         updateTotalScoresDisplay()
