@@ -22,6 +22,8 @@ class MainActivity : AppCompatActivity() {
 
     // 数据：累计得分、局记录列表
     private val totalScores = IntArray(4) { 0 }
+    // 添加一个数组记录当前局的得分
+    private val currentRoundScores = IntArray(4) { 0 }
     private val roundRecords = mutableListOf<String>()
     private lateinit var roundsAdapter: ArrayAdapter<String>
 
@@ -268,9 +270,11 @@ class MainActivity : AppCompatActivity() {
 
         // 记录当前局的得分
         val players = getPlayerNames()
-        val record = "局 ${currentRound - 1} 得分：${players[0]}: ${totalScores[0]}, ${players[1]}: ${totalScores[1]}, ${players[2]}: ${totalScores[2]}, ${players[3]}: ${totalScores[3]}"
+        val record = "局 ${currentRound - 1} 得分：${players[0]}: ${currentRoundScores[0]}, ${players[1]}: ${currentRoundScores[1]}, ${players[2]}: ${currentRoundScores[2]}, ${players[3]}: ${currentRoundScores[3]}"
         roundRecords.add(record)
 
+        // 清除当前局的得分记录
+        currentRoundScores.fill(0) // 清空当前局得分
 
         // 清除局记录
         roundsAdapter.notifyDataSetChanged()

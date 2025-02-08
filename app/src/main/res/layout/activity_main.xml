@@ -10,35 +10,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- 玩家姓名输入 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="玩家姓名（可修改）:" />
-
-        <EditText
-            android:id="@+id/etPlayer1Name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="玩家1姓名" />
-
-        <EditText
-            android:id="@+id/etPlayer2Name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="玩家2姓名" />
-
-        <EditText
-            android:id="@+id/etPlayer3Name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="玩家3姓名" />
-
-        <EditText
-            android:id="@+id/etPlayer4Name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="玩家4姓名" />
 
         <!-- 当前局数显示 -->
         <TextView
@@ -91,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="累计得分："
-            android:textSize="16sp"
+            android:textSize="25sp"
             android:layout_marginTop="16dp" />
 
         <!-- 局记录列表 -->
@@ -124,5 +95,35 @@
             android:text="查看历史记录"
             android:layout_marginTop="8dp"
             android:onClick="onViewHistory"/>
+        <!-- 玩家姓名输入 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="玩家姓名（可修改）:" />
+
+        <EditText
+            android:id="@+id/etPlayer1Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="玩家1姓名" />
+
+        <EditText
+            android:id="@+id/etPlayer2Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="玩家2姓名" />
+
+        <EditText
+            android:id="@+id/etPlayer3Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="玩家3姓名" />
+
+        <EditText
+            android:id="@+id/etPlayer4Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="玩家4姓名" />
+
     </LinearLayout>
 </ScrollView>
