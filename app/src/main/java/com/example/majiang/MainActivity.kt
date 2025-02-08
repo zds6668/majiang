@@ -180,13 +180,14 @@ class MainActivity : AppCompatActivity() {
             // 更新累计得分
             for (i in totalScores.indices) {
                 if (i == winnerIndex) totalScores[i] += winScore
+                else if (huPlayers.contains(i)) continue
                 else totalScores[i] -= loseScore
             }
 
             // 更新当前局得分
             currentRoundScores[winnerIndex] += winScore
             for (i in currentRoundScores.indices) {
-                if (i != winnerIndex) currentRoundScores[i] -= loseScore
+                if (i != winnerIndex && !huPlayers.contains(i)) currentRoundScores[i] -= loseScore
             }
 
             // 添加局记录
