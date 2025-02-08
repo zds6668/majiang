@@ -274,12 +274,12 @@ class MainActivity : AppCompatActivity() {
 
     // ---------------- 开始下一局 ----------------
     fun startNextRound(view: android.view.View) {
-        // 增加局数
-        currentRound++
-
         // 记录当前局的总得分
         val roundScore = totalScores.sum()
         historyRecords.add("局 $currentRound: 总得分 = $roundScore")
+
+        // 增加局数
+        currentRound++
 
         // 更新当前局记录显示
         updateCurrentRoundRecordsDisplay()
@@ -292,6 +292,7 @@ class MainActivity : AppCompatActivity() {
         updateTotalScoresDisplay()
         updateCurrentRoundDisplay()
     }
+
 
     // 处理点击"查看历史记录"按钮
     fun onViewHistory(view: android.view.View) {
