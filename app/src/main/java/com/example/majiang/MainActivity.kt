@@ -271,8 +271,6 @@ class MainActivity : AppCompatActivity() {
         val record = "局 ${currentRound - 1} 得分：${players[0]}: ${totalScores[0]}, ${players[1]}: ${totalScores[1]}, ${players[2]}: ${totalScores[2]}, ${players[3]}: ${totalScores[3]}"
         roundRecords.add(record)
 
-        // 清除当前局的得分记录
-        totalScores.fill(0)
 
         // 清除局记录
         roundsAdapter.notifyDataSetChanged()
