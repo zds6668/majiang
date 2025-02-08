@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         btnZimo = findViewById(R.id.btnZimo)
         btnDianpao = findViewById(R.id.btnDianpao)
         tvTotalScores = findViewById(R.id.tvTotalScores)
-        lvRounds = findViewById(R.id.lvRounds)
+
         currentRoundText = findViewById(R.id.currentRound)
 
         // 设置默认玩家姓名
@@ -62,7 +62,6 @@ class MainActivity : AppCompatActivity() {
 
         // 局记录 ListView 适配器
         roundsAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, roundRecords)
-        lvRounds.adapter = roundsAdapter
 
         // 按钮点击事件
         btnZimo.setOnClickListener { showZimoDialog() }
@@ -110,7 +109,8 @@ class MainActivity : AppCompatActivity() {
     // ---------------- 自摸计分 ----------------
     private fun showZimoDialog() {
         if (huPlayers.size >= 3) {
-            Toast.makeText(this, "已经有3个玩家胡牌，不能再自摸", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "已经有3个玩家胡牌，自动开始下一局", Toast.LENGTH_SHORT).show()
+            startNextRound(btnZimo) // 自动开始下一局
             return
         }
         val builder = AlertDialog.Builder(this)
@@ -125,25 +125,21 @@ class MainActivity : AppCompatActivity() {
         val btnConfirm = dialogView.findViewById<Button>(R.id.btnConfirm)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
 
-        // 获取未胡牌玩家列表及其原始下标
         val remainingPlayers = getRemainingPlayers()
-
-        // 提取玩家姓名，并创建适配器
         val playerNames = remainingPlayers.map { it.first }
         val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, playerNames)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerWinner.adapter = spinnerAdapter
 
-        // 番数选择：默认未选中（-1 表示未选择），点击后改变背景颜色以示选中
         var selectedFan = -1
         val fanButtons = listOf(btnFan1, btnFan2, btnFan3, btnFan4)
+
         fun clearFanSelection() {
             for (btn in fanButtons) {
                 btn.setBackgroundResource(android.R.drawable.btn_default)
             }
         }
 
-        // 为每个按钮设置点击事件
         btnFan1.setOnClickListener {
             clearFanSelection()
             btnFan1.setBackgroundResource(android.R.color.holo_blue_light)
@@ -173,57 +169,61 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // 获取底分
             val bottomScore = spinnerBottomScore.selectedItem.toString().toInt()
-
-            // 获取自摸玩家索引（通过姓名匹配原始下标）
             val winnerName = spinnerWinner.selectedItem.toString()
             val winnerIndex = remainingPlayers.first { it.first == winnerName }.second
 
-            // 检查该玩家是否已胡牌
             if (huPlayers.contains(winnerIndex)) {
                 Toast.makeText(this, "该玩家已经胡牌，无法自摸", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 记录该玩家的自摸
             huPlayers.add(winnerIndex)
-
-            // 计算分数
-            val winScore = bottomScore * selectedFan * (4 - huPlayers.size) // 根据胡牌玩家的数量计算得分
+            val winScore = bottomScore * selectedFan * (4 - huPlayers.size)
             val loseScore = bottomScore * selectedFan
 
-            // 更新累计得分
             for (i in totalScores.indices) {
                 if (i == winnerIndex) totalScores[i] += winScore
                 else if (huPlayers.contains(i)) continue
                 else totalScores[i] -= loseScore
             }
 
-            // 更新当前局得分
             currentRoundScores[winnerIndex] += winScore
             for (i in currentRoundScores.indices) {
                 if (i != winnerIndex && !huPlayers.contains(i)) currentRoundScores[i] -= loseScore
             }
 
-            // 添加局记录
-            val record = "自摸: $winnerName 自摸 $selectedFan 番，获得 +$winScore，其他各扣 -$loseScore"
+            // 获取扣分的玩家名称
+            val losingPlayers = getRemainingPlayers().filter { it.second != winnerIndex && !huPlayers.contains(it.second) }
+            val losingPlayerNames = losingPlayers.joinToString(", ") { it.first }
+
+            val record = "自摸: $winnerName 自摸 $selectedFan 番，获得 +$winScore，其他各扣 -$loseScore (${losingPlayerNames})"
             roundRecords.add(record)
-            roundsAdapter.notifyDataSetChanged() // 刷新记录显示
+            roundsAdapter.notifyDataSetChanged()
             updateTotalScoresDisplay()
+
+            // 检查是否有3个胡牌玩家
+            if (huPlayers.size >= 3) {
+                Toast.makeText(this, "已胡牌3人自动下一局", Toast.LENGTH_SHORT).show()
+                startNextRound(btnZimo) // 自动开始下一局
+            }
 
             dialog.dismiss()
         }
+
         btnCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
+
+
 
 
     // ---------------- 点炮计分 ----------------
 // ---------------- 点炮计分 ----------------
     private fun showDianpaoDialog() {
         if (huPlayers.size >= 3) {
-            Toast.makeText(this, "已经有3个玩家胡牌，不能再点炮", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "已经有3个玩家胡牌，自动开始下一局", Toast.LENGTH_SHORT).show()
+            startNextRound(btnZimo) // 自动开始下一局
             return
         }
         val builder = AlertDialog.Builder(this)
@@ -327,7 +327,11 @@ class MainActivity : AppCompatActivity() {
             roundRecords.add(record)
             roundsAdapter.notifyDataSetChanged() // 刷新记录显示
             updateTotalScoresDisplay()
-
+            // 检查是否有3个胡牌玩家
+            if (huPlayers.size >= 3) {
+                Toast.makeText(this, "已胡牌3人自动下一局", Toast.LENGTH_SHORT).show()
+                startNextRound(btnZimo) // 自动开始下一局
+            }
             dialog.dismiss()
         }
         btnCancel.setOnClickListener { dialog.dismiss() }
@@ -347,6 +351,7 @@ class MainActivity : AppCompatActivity() {
         val players = getPlayerNames()
         val record = "局 ${currentRound - 1} 得分：${players[0]}: ${currentRoundScores[0]}, ${players[1]}: ${currentRoundScores[1]}, ${players[2]}: ${currentRoundScores[2]}, ${players[3]}: ${currentRoundScores[3]}"
         roundRecords.add(record)
+        roundRecords.add("")
 
         // 清除当前局的得分记录
         currentRoundScores.fill(0) // 清空当前局得分

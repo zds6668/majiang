@@ -66,17 +66,8 @@
             android:layout_marginTop="16dp" />
 
         <!-- 局记录列表 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="局记录："
-            android:layout_marginTop="16dp" />
 
-        <ListView
-            android:id="@+id/lvRounds"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:dividerHeight="1dp" />
+
 
         <!-- 开始下一局按钮 -->
         <Button
