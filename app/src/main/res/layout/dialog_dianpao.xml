@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 点炮计分对话框布局 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 选择胡牌玩家 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择胡牌玩家:" />
+
+    <Spinner
+        android:id="@+id/spinnerWinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- 选择点炮玩家 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择点炮玩家:"
+        android:layout_marginTop="8dp"/>
+
+    <Spinner
+        android:id="@+id/spinnerDianpao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- 番数选择 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择番数:"
+        android:layout_marginTop="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="4dp"
+        android:weightSum="4">
+
+        <Button
+            android:id="@+id/btnFan1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="1番"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnFan2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="2番"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp" />
+
+        <Button
+            android:id="@+id/btnFan3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="3番"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp" />
+
+        <Button
+            android:id="@+id/btnFan4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="4番"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp" />
+    </LinearLayout>
+
+    <!-- 确认与取消按钮 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btnConfirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="确定"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="取消"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+</LinearLayout>

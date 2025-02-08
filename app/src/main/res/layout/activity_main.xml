@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 主界面：包括玩家姓名编辑、底分选择、快捷计分按钮、累计得分、局记录列表及当前局数显示 -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 玩家姓名输入 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="玩家姓名（可修改）:" />
+
+        <EditText
+            android:id="@+id/etPlayer1Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="玩家1姓名" />
+
+        <EditText
+            android:id="@+id/etPlayer2Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="玩家2姓名" />
+
+        <EditText
+            android:id="@+id/etPlayer3Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="玩家3姓名" />
+
+        <EditText
+            android:id="@+id/etPlayer4Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="玩家4姓名" />
+
+        <!-- 当前局数显示 -->
+        <TextView
+            android:id="@+id/currentRound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="当前局数：1"
+            android:textSize="18sp"
+            android:layout_marginTop="16dp"/>
+
+        <!-- 底分选择 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择底分（元）:"
+            android:layout_marginTop="16dp" />
+
+        <Spinner
+            android:id="@+id/spinnerBottomScore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- 快捷计分按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnZimo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="自摸计分" />
+
+            <Button
+                android:id="@+id/btnDianpao"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="点炮计分"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <!-- 累计得分显示 -->
+        <TextView
+            android:id="@+id/tvTotalScores"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="累计得分："
+            android:textSize="16sp"
+            android:layout_marginTop="16dp" />
+
+        <!-- 局记录列表 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="局记录："
+            android:layout_marginTop="16dp" />
+
+        <ListView
+            android:id="@+id/lvRounds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:dividerHeight="1dp" />
+
+        <!-- 开始下一局按钮 -->
+        <Button
+            android:id="@+id/startNewRound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开始下一局"
+            android:layout_marginTop="16dp"
+            android:onClick="startNextRound"/>
+
+        <!-- 查看历史记录按钮 -->
+        <Button
+            android:id="@+id/viewHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="查看历史记录"
+            android:layout_marginTop="8dp"
+            android:onClick="onViewHistory"/>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.Majiang" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- 可根据需要自定义主题 -->
+    </style>
+</resources>
