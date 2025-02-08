@@ -165,6 +165,12 @@ class MainActivity : AppCompatActivity() {
                 totalScores[i] += if (i == winnerIndex) winScore else -loseScore
             }
 
+            // 更新当前局得分
+            currentRoundScores[winnerIndex] += winScore
+            for (i in currentRoundScores.indices) {
+                if (i != winnerIndex) currentRoundScores[i] -= loseScore
+            }
+
             // 添加局记录
             val record = "自摸: ${players[winnerIndex]} 自摸 $selectedFan 番，获得 +$winScore，其他各扣 -$loseScore"
             roundRecords.add(record)
@@ -249,6 +255,10 @@ class MainActivity : AppCompatActivity() {
 
             totalScores[winnerIndex] += scoreChange
             totalScores[dianpaoIndex] -= scoreChange
+
+            // 更新当前局得分
+            currentRoundScores[winnerIndex] += scoreChange
+            currentRoundScores[dianpaoIndex] -= scoreChange
 
             // 更新局记录
             val record = "点炮: ${players[winnerIndex]} 胡牌，${players[dianpaoIndex]} 点炮，$selectedFan 番，${players[winnerIndex]} +$scoreChange, ${players[dianpaoIndex]} -$scoreChange"
