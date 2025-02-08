@@ -17,20 +17,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnZimo: Button
     private lateinit var btnDianpao: Button
     private lateinit var tvTotalScores: TextView
+    private lateinit var lvRounds: ListView
     private lateinit var currentRoundText: TextView
-    private lateinit var lvRounds: ListView // 当前局记录的列表
 
-    // 数据：累计得分
+    // 数据：累计得分、局记录列表
     private val totalScores = IntArray(4) { 0 }
+    private val roundRecords = mutableListOf<String>()
+    private lateinit var roundsAdapter: ArrayAdapter<String>
 
     // 当前局数
     private var currentRound = 1
-
-    // 历史记录列表
-    private val historyRecords = mutableListOf<String>()
-
-    // 当前局记录
-    private val currentRoundRecords = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +41,8 @@ class MainActivity : AppCompatActivity() {
         btnZimo = findViewById(R.id.btnZimo)
         btnDianpao = findViewById(R.id.btnDianpao)
         tvTotalScores = findViewById(R.id.tvTotalScores)
+        lvRounds = findViewById(R.id.lvRounds)
         currentRoundText = findViewById(R.id.currentRound)
-        lvRounds = findViewById(R.id.lvRounds) // 初始化当前局记录的 ListView
 
         // 设置默认玩家姓名
         etPlayer1Name.setText("玩家1")
@@ -60,6 +56,10 @@ class MainActivity : AppCompatActivity() {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerBottomScore.adapter = spinnerAdapter
 
+        // 局记录 ListView 适配器
+        roundsAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, roundRecords)
+        lvRounds.adapter = roundsAdapter
+
         // 按钮点击事件
         btnZimo.setOnClickListener { showZimoDialog() }
         btnDianpao.setOnClickListener { showDianpaoDialog() }
@@ -69,9 +69,6 @@ class MainActivity : AppCompatActivity() {
 
         // 更新当前局数显示
         updateCurrentRoundDisplay()
-
-        // 更新当前局记录显示
-        updateCurrentRoundRecordsDisplay()
     }
 
     // 更新累计得分显示
@@ -94,13 +91,6 @@ class MainActivity : AppCompatActivity() {
     // 更新当前局数显示
     private fun updateCurrentRoundDisplay() {
         currentRoundText.text = "当前局数：$currentRound"
-    }
-
-    // 更新当前局记录显示
-    private fun updateCurrentRoundRecordsDisplay() {
-        // 使用 ArrayAdapter 将局记录显示在 ListView 中
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, currentRoundRecords)
-        lvRounds.adapter = adapter
     }
 
     // ---------------- 自摸计分 ----------------
@@ -173,12 +163,11 @@ class MainActivity : AppCompatActivity() {
                 totalScores[i] += if (i == winnerIndex) winScore else -loseScore
             }
 
-            // 更新当前局记录
-            val record = "局 $currentRound: 自摸 - ${players[winnerIndex]} 获得 +$winScore，其他各扣 -$loseScore"
-            currentRoundRecords.add(record)
-
+            // 添加局记录
+            val record = "自摸: ${players[winnerIndex]} 自摸 $selectedFan 番，获得 +$winScore，其他各扣 -$loseScore"
+            roundRecords.add(record)
+            roundsAdapter.notifyDataSetChanged() // 刷新记录显示
             updateTotalScoresDisplay()
-            updateCurrentRoundRecordsDisplay()
 
             dialog.dismiss()
         }
@@ -259,12 +248,11 @@ class MainActivity : AppCompatActivity() {
             totalScores[winnerIndex] += scoreChange
             totalScores[dianpaoIndex] -= scoreChange
 
-            // 更新当前局记录
-            val record = "局 $currentRound: 点炮 - ${players[winnerIndex]} 胡牌，${players[dianpaoIndex]} 点炮，${players[winnerIndex]} +$scoreChange, ${players[dianpaoIndex]} -$scoreChange"
-            currentRoundRecords.add(record)
-
+            // 更新局记录
+            val record = "点炮: ${players[winnerIndex]} 胡牌，${players[dianpaoIndex]} 点炮，$selectedFan 番，${players[winnerIndex]} +$scoreChange, ${players[dianpaoIndex]} -$scoreChange"
+            roundRecords.add(record)
+            roundsAdapter.notifyDataSetChanged() // 刷新记录显示
             updateTotalScoresDisplay()
-            updateCurrentRoundRecordsDisplay()
 
             dialog.dismiss()
         }
@@ -274,32 +262,31 @@ class MainActivity : AppCompatActivity() {
 
     // ---------------- 开始下一局 ----------------
     fun startNextRound(view: android.view.View) {
-        // 记录当前局的总得分
-        val roundScore = totalScores.sum()
-        historyRecords.add("局 $currentRound: 总得分 = $roundScore")
-
         // 增加局数
         currentRound++
+        updateCurrentRoundDisplay()
 
-        // 更新当前局记录显示
-        updateCurrentRoundRecordsDisplay()
+        // 记录当前局的得分
+        val players = getPlayerNames()
+        val record = "局 ${currentRound - 1} 得分：${players[0]}: ${totalScores[0]}, ${players[1]}: ${totalScores[1]}, ${players[2]}: ${totalScores[2]}, ${players[3]}: ${totalScores[3]}"
+        roundRecords.add(record)
 
-        // 清空当前局记录
-        currentRoundRecords.clear()
-        updateCurrentRoundRecordsDisplay()
+        // 清除当前局的得分记录
+        totalScores.fill(0)
+
+        // 清除局记录
+        roundsAdapter.notifyDataSetChanged()
 
         // 更新总得分显示
         updateTotalScoresDisplay()
-        updateCurrentRoundDisplay()
     }
-
 
     // 处理点击"查看历史记录"按钮
     fun onViewHistory(view: android.view.View) {
         // 显示历史记录对话框
         val historyDialog = AlertDialog.Builder(this)
             .setTitle("历史记录")
-            .setMessage(historyRecords.joinToString("\n\n"))  // 每条记录之间添加额外的空行
+            .setMessage(roundRecords.joinToString("\n"))
             .setPositiveButton("关闭") { dialog, _ -> dialog.dismiss() }
             .create()
 

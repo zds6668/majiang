@@ -25,6 +25,8 @@
             android:name=".HistoryActivity"
             android:exported="true">
         </activity>
+        <activity android:name=".EditPlayerNamesActivity" />
+
     </application>
 
 </manifest>
