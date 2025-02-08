@@ -98,6 +98,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------- 自摸计分 ----------------
+// ---------------- 获取剩余玩家 ----------------
+    private fun getRemainingPlayers(): List<String> {
+        val players = getPlayerNames()
+        return players.filterIndexed { index, _ -> !huPlayers.contains(index) } // 只保留未胡牌的玩家
+    }
+
+    // ---------------- 自摸计分 ----------------
     private fun showZimoDialog() {
         if (huPlayers.size >= 3) {
             Toast.makeText(this, "已经有3个玩家胡牌，不能再自摸", Toast.LENGTH_SHORT).show()
@@ -115,9 +122,11 @@ class MainActivity : AppCompatActivity() {
         val btnConfirm = dialogView.findViewById<Button>(R.id.btnConfirm)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
 
-        // 使用主界面当前的玩家姓名填充 spinner
-        val players = getPlayerNames()
-        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, players)
+        // 获取未胡牌玩家列表
+        val remainingPlayers = getRemainingPlayers()
+
+        // 创建适配器并设置给 spinner
+        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, remainingPlayers)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerWinner.adapter = spinnerAdapter
 
@@ -191,7 +200,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             // 添加局记录
-            val record = "自摸: ${players[winnerIndex]} 自摸 $selectedFan 番，获得 +$winScore，其他各扣 -$loseScore"
+            val record = "自摸: ${remainingPlayers[winnerIndex]} 自摸 $selectedFan 番，获得 +$winScore，其他各扣 -$loseScore"
             roundRecords.add(record)
             roundsAdapter.notifyDataSetChanged() // 刷新记录显示
             updateTotalScoresDisplay()
@@ -221,12 +230,14 @@ class MainActivity : AppCompatActivity() {
         val btnConfirm = dialogView.findViewById<Button>(R.id.btnConfirm)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
 
-        // 使用当前玩家姓名填充 spinner
-        val players = getPlayerNames()
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, players)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerWinner.adapter = adapter
-        spinnerDianpao.adapter = adapter
+        // 获取未胡牌玩家列表
+        val remainingPlayers = getRemainingPlayers()
+
+        // 创建适配器并设置给 spinner
+        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, remainingPlayers)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerWinner.adapter = spinnerAdapter
+        spinnerDianpao.adapter = spinnerAdapter
 
         // 番数选择：默认未选中
         var selectedFan = -1
@@ -267,23 +278,28 @@ class MainActivity : AppCompatActivity() {
             // 获取胡牌和点炮玩家索引
             val winnerIndex = spinnerWinner.selectedItemPosition
             val dianpaoIndex = spinnerDianpao.selectedItemPosition
+
             // 检查该玩家是否已胡牌
             if (huPlayers.contains(winnerIndex)) {
                 Toast.makeText(this, "该玩家已经胡牌，无法点炮", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
+            // 检查胡牌玩家和点炮玩家不能相同
             if (winnerIndex == dianpaoIndex) {
                 Toast.makeText(this, "胡牌玩家和点炮玩家不能相同", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            // 记录该玩家的自摸
+
+            // 记录该玩家的胡牌
             huPlayers.add(winnerIndex)
+
             // 获取底分
             val bottomScore = spinnerBottomScore.selectedItem.toString().toInt()
             // 点炮计算：胡牌玩家加分 = 底分 × 番数；点炮玩家扣分 = 底分 × 番数
             val scoreChange = bottomScore * selectedFan
 
+            // 更新累计得分
             totalScores[winnerIndex] += scoreChange
             totalScores[dianpaoIndex] -= scoreChange
 
@@ -292,7 +308,7 @@ class MainActivity : AppCompatActivity() {
             currentRoundScores[dianpaoIndex] -= scoreChange
 
             // 更新局记录
-            val record = "点炮: ${players[winnerIndex]} 胡牌，${players[dianpaoIndex]} 点炮，$selectedFan 番，${players[winnerIndex]} +$scoreChange, ${players[dianpaoIndex]} -$scoreChange"
+            val record = "点炮: ${remainingPlayers[winnerIndex]} 胡牌，${remainingPlayers[dianpaoIndex]} 点炮，$selectedFan 番，${remainingPlayers[winnerIndex]} +$scoreChange, ${remainingPlayers[dianpaoIndex]} -$scoreChange"
             roundRecords.add(record)
             roundsAdapter.notifyDataSetChanged() // 刷新记录显示
             updateTotalScoresDisplay()
@@ -302,6 +318,8 @@ class MainActivity : AppCompatActivity() {
         btnCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
+
+
 
     // ---------------- 开始下一局 ----------------
     fun startNextRound(view: android.view.View) {
