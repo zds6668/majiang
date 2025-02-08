@@ -1,10 +1,16 @@
 package com.example.majiang
 
 import android.app.AlertDialog
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import android.widget.AdapterView
+import android.os.VibrationEffect
+import android.os.Vibrator
+import androidx.annotation.RequiresApi
 
 class MainActivity : AppCompatActivity() {
 
@@ -218,8 +224,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    // ---------------- 点炮计分 ----------------
-// ---------------- 点炮计分 ----------------
     private fun showDianpaoDialog() {
         if (huPlayers.size >= 3) {
             Toast.makeText(this, "已经有3个玩家胡牌，自动开始下一局", Toast.LENGTH_SHORT).show()
@@ -249,6 +253,30 @@ class MainActivity : AppCompatActivity() {
         spinnerWinner.adapter = spinnerAdapter
         spinnerDianpao.adapter = spinnerAdapter
 
+        spinnerWinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // 获取被选择的胡牌玩家
+                val selectedWinner = spinnerWinner.selectedItem.toString()
+
+                // 获取剩余未胡牌的玩家，排除已经选择的胡牌玩家
+                val remainingPlayers = getRemainingPlayers().filterNot { it.first == selectedWinner }
+
+                // 获取剩余玩家的姓名
+                val updatedPlayerNames = remainingPlayers.map { it.first }
+
+                // 更新点炮玩家的选择框内容
+                val updatedAdapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_item, updatedPlayerNames)
+                updatedAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinnerDianpao.adapter = updatedAdapter
+            }
+
+            // 必须实现的 onNothingSelected 方法
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // 可以留空，或者你也可以添加一些默认操作
+            }
+        }
+
+
         // 番数选择：默认未选中
         var selectedFan = -1
         val fanButtons = listOf(btnFan1, btnFan2, btnFan3, btnFan4)
@@ -257,6 +285,7 @@ class MainActivity : AppCompatActivity() {
                 btn.setBackgroundResource(android.R.drawable.btn_default)
             }
         }
+
         btnFan1.setOnClickListener {
             clearFanSelection()
             btnFan1.setBackgroundResource(android.R.color.holo_blue_light)
@@ -327,11 +356,13 @@ class MainActivity : AppCompatActivity() {
             roundRecords.add(record)
             roundsAdapter.notifyDataSetChanged() // 刷新记录显示
             updateTotalScoresDisplay()
+
             // 检查是否有3个胡牌玩家
             if (huPlayers.size >= 3) {
                 Toast.makeText(this, "已胡牌3人自动下一局", Toast.LENGTH_SHORT).show()
                 startNextRound(btnZimo) // 自动开始下一局
             }
+
             dialog.dismiss()
         }
         btnCancel.setOnClickListener { dialog.dismiss() }
@@ -341,8 +372,26 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    // ---------------- 开始下一局 ----------------
+
+
+    @RequiresApi(Build.VERSION_CODES.M)
     fun startNextRound(view: android.view.View) {
+        // 获取 Vibrator 实例
+        val vibrator = getSystemService(Vibrator::class.java)
+
+        // 判断设备是否支持震动
+        if (vibrator?.hasVibrator() == true) {
+            // 创建震动效果 (震动时长为 500 毫秒)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                // 对于 Android 8.0 及以上版本使用 VibrationEffect
+                val vibrationEffect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
+                vibrator.vibrate(vibrationEffect)
+            } else {
+                // 对于 Android 8.0 以下版本使用传统方式
+                vibrator.vibrate(500)
+            }
+        }
+
         // 增加局数
         currentRound++
         updateCurrentRoundDisplay()
