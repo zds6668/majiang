@@ -22,13 +22,15 @@ class MainActivity : AppCompatActivity() {
 
     // 数据：累计得分、局记录列表
     private val totalScores = IntArray(4) { 0 }
-    // 添加一个数组记录当前局的得分
     private val currentRoundScores = IntArray(4) { 0 }
     private val roundRecords = mutableListOf<String>()
     private lateinit var roundsAdapter: ArrayAdapter<String>
 
     // 当前局数
     private var currentRound = 1
+
+    // 自摸玩家顺序（每局最多4个自摸玩家）
+    private val zimoOrder = mutableListOf<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +98,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------- 自摸计分 ----------------
+// ---------------- 自摸计分 ----------------
     private fun showZimoDialog() {
+        // 检查是否已有3个玩家自摸
+        if (zimoOrder.size >= 3) {
+            Toast.makeText(this, "已经有3个玩家自摸，不能再自摸", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val builder = AlertDialog.Builder(this)
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_zimo, null)
         builder.setView(dialogView)
@@ -182,6 +191,7 @@ class MainActivity : AppCompatActivity() {
         btnCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
+
 
     // ---------------- 点炮计分 ----------------
     private fun showDianpaoDialog() {
@@ -288,6 +298,9 @@ class MainActivity : AppCompatActivity() {
 
         // 清除局记录
         roundsAdapter.notifyDataSetChanged()
+
+        // 清除自摸玩家顺序
+        zimoOrder.clear()
 
         // 更新总得分显示
         updateTotalScoresDisplay()
